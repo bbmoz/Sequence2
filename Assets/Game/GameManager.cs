@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour {
 	// store dragging nodes
 	public ArrayList nodesDragged;
 
+	// line renderer
+	public LineRenderer lineRenderer;
+
 	// singleton
 	public static GameManager gm_Instance = null;
 	public static GameManager Get() {
@@ -29,7 +32,9 @@ public class GameManager : MonoBehaviour {
 	}
 
 	// side-most position of grid
+	[HideInInspector]
 	public float sideX;
+	[HideInInspector]
 	public float sideY;
 
 	// Use this for initialization
@@ -46,6 +51,9 @@ public class GameManager : MonoBehaviour {
 				nodeGrid[x,y] = spawnNode(x-sideX, y-sideY);
 			}
 		}
+
+		// set line renderer width
+		lineRenderer.SetWidth(0.3f,0.3f);
 	}
 	
 	// Update is called once per frame

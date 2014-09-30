@@ -42,12 +42,18 @@ public class NodeManager : MonoBehaviour {
 
 	// unclick node
 	void OnMouseUp() {
+		// clear nodes dragged array
 		foreach (GameObject node in GameManager.Get().nodesDragged) {
 			node.renderer.material.shader = Shader.Find("Diffuse");
 			node.GetComponent<NodeManager>().nodeEntered = false;
 			node.GetComponent<NodeManager>().randomizeNumber();
 		}
 		GameManager.Get().nodesDragged.Clear();
+
+		// remove all instances of line renderer
+		foreach(Object clone in GameObject.FindGameObjectsWithTag("linerenderer")) {
+			Destroy(clone);
+		}
 	}
 
 	// drag onto another node
@@ -74,6 +80,14 @@ public class NodeManager : MonoBehaviour {
 	private void addNodeToNodesDragged() {
 		nodeEntered = true;
 		GameManager.Get().nodesDragged.Add(gameObject);
-		renderer.material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+		renderer.material.shader = Shader.Find("Mobile/Bumped Specular");
+
+		// add line renderer
+		if (GameManager.Get().nodesDragged.Count > 1) {
+			var nodesDragged = GameManager.Get().nodesDragged.ToArray();
+			GameManager.Get().lineRenderer.SetPosition(0, (nodesDragged[nodesDragged.Length-2] as GameObject).transform.position);
+			GameManager.Get().lineRenderer.SetPosition(1, (nodesDragged[nodesDragged.Length-1] as GameObject).transform.position);
+			Instantiate(GameManager.Get().lineRenderer);
+		}
 	}
 }
