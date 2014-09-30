@@ -39,6 +39,8 @@ public class GameManager : MonoBehaviour {
 	[HideInInspector]
 	public int score;
 
+	private Shader zapShader;
+
 	// Use this for initialization
 	void Start () {
 		// grid should be generated at origin
@@ -47,6 +49,7 @@ public class GameManager : MonoBehaviour {
 		sideX = (float)nodeGridSizeX / 2.0f;
 		sideY = (float)nodeGridSizeY / 2.0f;
 		score = 0;
+		zapShader = Shader.Find("Reflective/Specular");
 
 		// spawn nodes
 		for (int x=0; x<nodeGridSizeX; x++) {
@@ -84,60 +87,61 @@ public class GameManager : MonoBehaviour {
 
 	// initial tree zap
 	private void treeZap(int number) {
+		int nodeNumber = 0;
+		int neighborNumOne,neighborNumTwo,neighborNumThree,neighborNumFour,neighborNumFive,neighborNumSix,neighborNumSeven,neighborNumEight;
 		for (int i=0; i<nodeGridSizeX; i++) {
 			for (int j=0; j<nodeGridSizeY; j++) {
-				int nodeNumber = nodeGrid[i,j].GetComponent<NodeManager>().number;
+				nodeNumber = nodeGrid[i,j].GetComponent<NodeManager>().number;
 				if (nodeNumber == number) {
-					nodeGrid[i,j].renderer.material.shader = Shader.Find("Reflective/Specular");
+					nodeGrid[i,j].renderer.material.shader = zapShader;
 					// get valid neighbors
-					int neighborNumOne,neighborNumTwo,neighborNumThree,neighborNumFour,neighborNumFive,neighborNumSix,neighborNumSeven,neighborNumEight;
 					neighborNumOne=neighborNumTwo=neighborNumThree=neighborNumFour=neighborNumFive=neighborNumSix=neighborNumSeven=neighborNumEight = 0;
 					try {
 						neighborNumOne = nodeGrid[i-1,j-1].GetComponent<NodeManager>().number;
 						if (neighborNumOne == nodeNumber-1 || neighborNumOne == nodeNumber+1) {
-							treeZapRecurse(i, j, i-1, j-1);
+							treeZapRecurse(i-1, j-1);
 						}
 					} catch {}
 					try {
 						neighborNumTwo = nodeGrid[i-1,j].GetComponent<NodeManager>().number;
 						if (neighborNumTwo == nodeNumber-1 || neighborNumTwo == nodeNumber+1) {
-							treeZapRecurse(i, j, i-1, j);
+							treeZapRecurse(i-1, j);
 						}
 					} catch {}
 					try {
-						if (neighborNumThree == nodeNumber-1 || neighborNumThree == nodeNumber+1) {
-							treeZapRecurse(i, j, i-1, j+1);
-						}
 						neighborNumThree = nodeGrid[i-1,j+1].GetComponent<NodeManager>().number;
+						if (neighborNumThree == nodeNumber-1 || neighborNumThree == nodeNumber+1) {
+							treeZapRecurse(i-1, j+1);
+						}
 					} catch {}
 					try {
 						neighborNumFour = nodeGrid[i,j-1].GetComponent<NodeManager>().number;
 						if (neighborNumFour == nodeNumber-1 || neighborNumFour == nodeNumber+1) {
-							treeZapRecurse(i, j, i, j-1);
+							treeZapRecurse(i, j-1);
 						}
 					} catch {}
 					try {
 						neighborNumFive = nodeGrid[i+1,j-1].GetComponent<NodeManager>().number;
 						if (neighborNumFive == nodeNumber-1 || neighborNumFive == nodeNumber+1) {
-							treeZapRecurse(i, j, i+1, j-1);
+							treeZapRecurse(i+1, j-1);
 						}
 					} catch {}
 					try {
 						neighborNumSix = nodeGrid[i+1,j].GetComponent<NodeManager>().number;
 						if (neighborNumSix == nodeNumber-1 || neighborNumSix == nodeNumber+1) {
-							treeZapRecurse(i, j, i+1, j);
+							treeZapRecurse(i+1, j);
 						}
 					} catch {}
 					try {
 						neighborNumSeven = nodeGrid[i,j+1].GetComponent<NodeManager>().number;
 						if (neighborNumSeven == nodeNumber-1 || neighborNumSeven == nodeNumber+1) {
-							treeZapRecurse(i, j, i, j+1);
+							treeZapRecurse(i, j+1);
 						}
 					} catch {}
 					try {
 						neighborNumEight = nodeGrid[i+1,j+1].GetComponent<NodeManager>().number;
 						if (neighborNumEight == nodeNumber-1 || neighborNumEight == nodeNumber+1) {
-							treeZapRecurse(i, j, i+1, j+1);
+							treeZapRecurse(i+1, j+1);
 						}
 					} catch {}
 				}
@@ -146,74 +150,74 @@ public class GameManager : MonoBehaviour {
 	}
 
 	// tree zap recursion
-	private void treeZapRecurse(int oldi, int oldj, int i, int j) {
-		nodeGrid[i,j].renderer.material.shader = Shader.Find("Reflective/Specular");
+	private void treeZapRecurse(int i, int j) {
 		int nodeNumber = nodeGrid[i,j].GetComponent<NodeManager>().number;
+		nodeGrid[i,j].renderer.material.shader = zapShader;
 
 		// get valid neighbors
 		int neighborNumOne,neighborNumTwo,neighborNumThree,neighborNumFour,neighborNumFive,neighborNumSix,neighborNumSeven,neighborNumEight;
 		neighborNumOne=neighborNumTwo=neighborNumThree=neighborNumFour=neighborNumFive=neighborNumSix=neighborNumSeven=neighborNumEight = 0;
 		try {
-			if (i-1 != oldi && j-1 != oldj && nodeGrid[i-1,j-1].renderer.material.shader != Shader.Find("Reflective/Specular")) {
+			if (nodeGrid[i-1,j-1].renderer.material.shader != zapShader) {
 				neighborNumOne = nodeGrid[i-1,j-1].GetComponent<NodeManager>().number;
 				if (neighborNumOne == nodeNumber-1 || neighborNumOne == nodeNumber+1) {
-					treeZapRecurse(i, j, i-1, j-1);
+					treeZapRecurse(i-1, j-1);
 				}
 			}
 		} catch {}
 		try {
-			if (i-1 != oldi && j != oldj && nodeGrid[i-1,j].renderer.material.shader != Shader.Find("Reflective/Specular")) {
+			if (nodeGrid[i-1,j].renderer.material.shader != zapShader) {
 				neighborNumTwo = nodeGrid[i-1,j].GetComponent<NodeManager>().number;
 				if (neighborNumTwo == nodeNumber-1 || neighborNumTwo == nodeNumber+1) {
-					treeZapRecurse(i, j, i-1, j);
+					treeZapRecurse(i-1, j);
 				}
 			}
 		} catch {}
 		try {
-			if (i-1 != oldi && j+1 != oldj && nodeGrid[i-1,j+1].renderer.material.shader != Shader.Find("Reflective/Specular")) {
+			if (nodeGrid[i-1,j+1].renderer.material.shader != zapShader) {
 				neighborNumThree = nodeGrid[i-1,j+1].GetComponent<NodeManager>().number;
 				if (neighborNumThree == nodeNumber-1 || neighborNumThree == nodeNumber+1) {
-					treeZapRecurse(i, j, i-1, j+1);
+					treeZapRecurse(i-1, j+1);
 				}
 			}
 		} catch {}
 		try {
-			if (i != oldi && j-1 != oldj && nodeGrid[i,j-1].renderer.material.shader != Shader.Find("Reflective/Specular")) {
+			if (nodeGrid[i,j-1].renderer.material.shader != zapShader) {
 				neighborNumFour = nodeGrid[i,j-1].GetComponent<NodeManager>().number;
 				if (neighborNumFour == nodeNumber-1 || neighborNumFour == nodeNumber+1) {
-					treeZapRecurse(i, j, i, j-1);
+					treeZapRecurse(i, j-1);
 				}
 			}
 		} catch {}
 		try {
-			if (i+1 != oldi && j-1 != oldj && nodeGrid[i+1,j-1].renderer.material.shader != Shader.Find("Reflective/Specular")) {
+			if (nodeGrid[i+1,j-1].renderer.material.shader != zapShader) {
 				neighborNumFive = nodeGrid[i+1,j-1].GetComponent<NodeManager>().number;
 				if (neighborNumFive == nodeNumber-1 || neighborNumFive == nodeNumber+1) {
-					treeZapRecurse(i, j, i+1, j-1);
+					treeZapRecurse(i+1, j-1);
 				}
 			}
 		} catch {}
 		try {
-			if (i+1 != oldi && j != oldj && nodeGrid[i+1,j].renderer.material.shader != Shader.Find("Reflective/Specular")) {
+			if (nodeGrid[i+1,j].renderer.material.shader != zapShader) {
 				neighborNumSix = nodeGrid[i+1,j].GetComponent<NodeManager>().number;
 				if (neighborNumSix == nodeNumber-1 || neighborNumSix == nodeNumber+1) {
-					treeZapRecurse(i, j, i+1, j);
+					treeZapRecurse(i+1, j);
 				}
 			}
 		} catch {}
 		try {
-			if (i != oldi && j+1 != oldj && nodeGrid[i,j+1].renderer.material.shader != Shader.Find("Reflective/Specular")) {
+			if (nodeGrid[i,j+1].renderer.material.shader != zapShader) {
 				neighborNumSeven = nodeGrid[i,j+1].GetComponent<NodeManager>().number;
 				if (neighborNumSeven == nodeNumber-1 || neighborNumSeven == nodeNumber+1) {
-					treeZapRecurse(i, j, i, j+1);
+					treeZapRecurse(i, j+1);
 				}
 			}
 		} catch {}
 		try {
-			if (i+1 != oldi && j+1 != oldj && nodeGrid[i+1,j+1].renderer.material.shader != Shader.Find("Reflective/Specular")) {
+			if (nodeGrid[i+1,j+1].renderer.material.shader != zapShader) {
 				neighborNumEight = nodeGrid[i+1,j+1].GetComponent<NodeManager>().number;
 				if (neighborNumEight == nodeNumber-1 || neighborNumEight == nodeNumber+1) {
-					treeZapRecurse(i, j, i+1, j+1);
+					treeZapRecurse(i+1, j+1);
 				}
 			}
 		} catch {}
