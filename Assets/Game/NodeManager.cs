@@ -10,7 +10,8 @@ public class NodeManager : MonoBehaviour {
 	public int number;
 
 	// boolean to make sure OnMouseEnter is run once
-	private bool nodeEntered;
+	[HideInInspector]
+	public bool nodeEntered;
 
 	// Use this for initialization
 	void Start () {
@@ -27,7 +28,7 @@ public class NodeManager : MonoBehaviour {
 	/// Randomizes the number.
 	/// </summary>
 	/// <returns>The number.</returns>
-	private void randomizeNumber() {
+	public void randomizeNumber() {
 		number = Random.Range(GameManager.Get().nodeMin, GameManager.gm_Instance.nodeMax + 1);
 		// set texture to node
 		renderer.material.mainTexture = GameManager.Get().nodeTextures[0].numbers[number - 1];
@@ -48,6 +49,9 @@ public class NodeManager : MonoBehaviour {
 			node.GetComponent<NodeManager>().nodeEntered = false;
 			node.GetComponent<NodeManager>().randomizeNumber();
 		}
+
+		// add score
+		GameManager.Get().score += GameManager.Get().nodesDragged.Count;
 		GameManager.Get().nodesDragged.Clear();
 
 		// remove all instances of line renderer
