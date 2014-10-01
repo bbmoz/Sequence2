@@ -45,11 +45,13 @@ public class NodeManager : MonoBehaviour {
 	void OnMouseUp() {
 		// clear nodes
 		foreach (GameObject node in GameManager.Get().nodesDragged) {
+			node.SetActive(false);
+			/*
 			node.renderer.material.shader = Shader.Find("Diffuse");
 			node.GetComponent<NodeManager>().nodeEntered = false;
 			node.GetComponent<NodeManager>().randomizeNumber();
+			*/
 		}
-
 
 		// add score
 		GameManager.Get().AddScore(fibbo(GameManager.Get().nodesDragged.Count));
@@ -73,7 +75,7 @@ public class NodeManager : MonoBehaviour {
 
 			// limit to immediate adjacent node
 			if (nodeTest) {
-				if ((posX == nm.posX || posX == nm.posX - 1.0f || posX == nm.posX + 1.0f) && (posY == nm.posY || posY == nm.posY - 1.0f || posY == nm.posY + 1.0f)) {
+				//if ((posX == nm.posX || posX == nm.posX - 1.0f || posX == nm.posX + 1.0f) && (posY == nm.posY || posY == nm.posY - 1.0f || posY == nm.posY + 1.0f)) {
 					// limit to number in next sequence and check if node was already included in the sequence
 					if ((number == nm.number - 1 || number == nm.number + 1) && renderer.material.shader.name != "Mobile/Bumped Specular") {
 						if (nodesDragged.Count > 1) {
@@ -81,7 +83,7 @@ public class NodeManager : MonoBehaviour {
 						}
 						addNodeToNodesDragged();
 					}
-				}
+				//}
 			}
 		}
 	}
