@@ -43,16 +43,18 @@ public class NodeManager : MonoBehaviour {
 
 	// unclick node
 	void OnMouseUp() {
-		// clear nodes dragged array
+		// clear nodes
 		foreach (GameObject node in GameManager.Get().nodesDragged) {
 			node.renderer.material.shader = Shader.Find("Diffuse");
 			node.GetComponent<NodeManager>().nodeEntered = false;
 			node.GetComponent<NodeManager>().randomizeNumber();
 		}
 
+
 		// add score
-//		GameManager.Get().score += GameManager.Get().nodesDragged.Count;
-		GameManager.Get ().AddScore (Fibbo (GameManager.Get ().nodesDragged.Count));
+		GameManager.Get().AddScore(fibbo(GameManager.Get().nodesDragged.Count));
+
+		// clear nodes dragged array
 		GameManager.Get().nodesDragged.Clear();
 
 
@@ -64,24 +66,19 @@ public class NodeManager : MonoBehaviour {
 
 	// drag onto another node
 	void OnMouseEnter() {
-		print (GameManager.Get ().nodesDragged.Count);
-		bool nodeTest = true;
 		if (!nodeEntered && GameManager.Get().nodesDragged.Count > 0) {
+			bool nodeTest = true;
 			ArrayList nodesDragged = GameManager.Get().nodesDragged;
 			NodeManager nm = ((GameObject)nodesDragged.ToArray()[nodesDragged.Count - 1]).GetComponent<NodeManager>();
 
-			// Check if node was already included in the sequence
-			if (GameManager.Get().nodesDragged.Count > 1) {
-				NodeManager pnm = ((GameObject)nodesDragged.ToArray()[nodesDragged.Count - 2]).GetComponent<NodeManager>();
-				if ((posX == pnm.posX) && (posY == pnm.posY)) {
-					nodeTest = false;
-				}
-			}
 			// limit to immediate adjacent node
-			if (nodeTest == true) {
+			if (nodeTest) {
 				if ((posX == nm.posX || posX == nm.posX - 1.0f || posX == nm.posX + 1.0f) && (posY == nm.posY || posY == nm.posY - 1.0f || posY == nm.posY + 1.0f)) {
-					// limit to number in next sequence
-					if (number == nm.number - 1 || number == nm.number + 1) {
+					// limit to number in next sequence and check if node was already included in the sequence
+					if ((number == nm.number - 1 || number == nm.number + 1) && renderer.material.shader.name != "Mobile/Bumped Specular") {
+						if (nodesDragged.Count > 1) {
+							var i = renderer.material.shader;
+						}
 						addNodeToNodesDragged();
 					}
 				}
@@ -108,11 +105,13 @@ public class NodeManager : MonoBehaviour {
 			Instantiate(GameManager.Get().lineRenderer);
 		}
 	}
-	private int Fibbo( int a) {
+
+	// returns the fibonacci sum for a number
+	private int fibbo(int a) {
 		if (a==1) { return -50; }
 		int x = 0;
 		int y = 100;
-		for ( int i = 1 ; i < a; i++) {
+		for (int i = 1 ; i < a; i++) {
 			x += y;
 			y += 100;
 		}

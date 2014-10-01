@@ -40,10 +40,10 @@ public class GameManager : MonoBehaviour {
 	public float sideX;
 	[HideInInspector]
 	public float sideY;
-	//[HideInInspector]
-	//public int score;
 
-	private Shader zapShader;
+	// shader for tree zapper
+	[HideInInspector]
+	public Shader zapShader;
 
 	// Use this for initialization
 	void Start () {
@@ -52,12 +52,11 @@ public class GameManager : MonoBehaviour {
 		nodesDragged = new ArrayList();
 		sideX = (float)nodeGridSizeX / 2.0f;
 		sideY = (float)nodeGridSizeY / 2.0f;
-		score = 0;
 		zapShader = Shader.Find("Reflective/Specular");
 
 		// initialize score
 		score = 0;
-		UpdateScore ();
+		UpdateScore();
 
 		// spawn nodes
 		for (int x=0; x<nodeGridSizeX; x++) {
@@ -166,7 +165,7 @@ public class GameManager : MonoBehaviour {
 		int neighborNumOne,neighborNumTwo,neighborNumThree,neighborNumFour,neighborNumFive,neighborNumSix,neighborNumSeven,neighborNumEight;
 		neighborNumOne=neighborNumTwo=neighborNumThree=neighborNumFour=neighborNumFive=neighborNumSix=neighborNumSeven=neighborNumEight = 0;
 		try {
-			if (nodeGrid[i-1,j-1].renderer.material.shader != zapShader) {
+			if (nodeGrid[i-1,j-1].renderer.material.shader.name != zapShader.name) {
 				neighborNumOne = nodeGrid[i-1,j-1].GetComponent<NodeManager>().number;
 				if (neighborNumOne == nodeNumber-1 || neighborNumOne == nodeNumber+1) {
 					treeZapRecurse(i-1, j-1);
@@ -174,7 +173,7 @@ public class GameManager : MonoBehaviour {
 			}
 		} catch {}
 		try {
-			if (nodeGrid[i-1,j].renderer.material.shader != zapShader) {
+			if (nodeGrid[i-1,j].renderer.material.shader.name != zapShader.name) {
 				neighborNumTwo = nodeGrid[i-1,j].GetComponent<NodeManager>().number;
 				if (neighborNumTwo == nodeNumber-1 || neighborNumTwo == nodeNumber+1) {
 					treeZapRecurse(i-1, j);
@@ -182,7 +181,7 @@ public class GameManager : MonoBehaviour {
 			}
 		} catch {}
 		try {
-			if (nodeGrid[i-1,j+1].renderer.material.shader != zapShader) {
+			if (nodeGrid[i-1,j+1].renderer.material.shader.name != zapShader.name) {
 				neighborNumThree = nodeGrid[i-1,j+1].GetComponent<NodeManager>().number;
 				if (neighborNumThree == nodeNumber-1 || neighborNumThree == nodeNumber+1) {
 					treeZapRecurse(i-1, j+1);
@@ -190,7 +189,7 @@ public class GameManager : MonoBehaviour {
 			}
 		} catch {}
 		try {
-			if (nodeGrid[i,j-1].renderer.material.shader != zapShader) {
+			if (nodeGrid[i,j-1].renderer.material.shader.name != zapShader.name) {
 				neighborNumFour = nodeGrid[i,j-1].GetComponent<NodeManager>().number;
 				if (neighborNumFour == nodeNumber-1 || neighborNumFour == nodeNumber+1) {
 					treeZapRecurse(i, j-1);
@@ -198,7 +197,7 @@ public class GameManager : MonoBehaviour {
 			}
 		} catch {}
 		try {
-			if (nodeGrid[i+1,j-1].renderer.material.shader != zapShader) {
+			if (nodeGrid[i+1,j-1].renderer.material.shader.name != zapShader.name) {
 				neighborNumFive = nodeGrid[i+1,j-1].GetComponent<NodeManager>().number;
 				if (neighborNumFive == nodeNumber-1 || neighborNumFive == nodeNumber+1) {
 					treeZapRecurse(i+1, j-1);
@@ -206,7 +205,7 @@ public class GameManager : MonoBehaviour {
 			}
 		} catch {}
 		try {
-			if (nodeGrid[i+1,j].renderer.material.shader != zapShader) {
+			if (nodeGrid[i+1,j].renderer.material.shader.name != zapShader.name) {
 				neighborNumSix = nodeGrid[i+1,j].GetComponent<NodeManager>().number;
 				if (neighborNumSix == nodeNumber-1 || neighborNumSix == nodeNumber+1) {
 					treeZapRecurse(i+1, j);
@@ -214,7 +213,7 @@ public class GameManager : MonoBehaviour {
 			}
 		} catch {}
 		try {
-			if (nodeGrid[i,j+1].renderer.material.shader != zapShader) {
+			if (nodeGrid[i,j+1].renderer.material.shader.name != zapShader.name) {
 				neighborNumSeven = nodeGrid[i,j+1].GetComponent<NodeManager>().number;
 				if (neighborNumSeven == nodeNumber-1 || neighborNumSeven == nodeNumber+1) {
 					treeZapRecurse(i, j+1);
@@ -222,7 +221,7 @@ public class GameManager : MonoBehaviour {
 			}
 		} catch {}
 		try {
-			if (nodeGrid[i+1,j+1].renderer.material.shader != zapShader) {
+			if (nodeGrid[i+1,j+1].renderer.material.shader.name != zapShader.name) {
 				neighborNumEight = nodeGrid[i+1,j+1].GetComponent<NodeManager>().number;
 				if (neighborNumEight == nodeNumber-1 || neighborNumEight == nodeNumber+1) {
 					treeZapRecurse(i+1, j+1);
@@ -245,15 +244,12 @@ public class GameManager : MonoBehaviour {
 	public void AddScore (int newScoreValue)
 	{
 		score += newScoreValue;
-		if (score < 0)
-			score = 0;
-		UpdateScore ();
+		if (score < 0) { score = 0; }
+		UpdateScore();
 	}
 	// Updates the score gui text
-	void UpdateScore ()
+	void UpdateScore()
 	{
 		scoreText.text = "Score: " + score;
 	}
-
-
 }
