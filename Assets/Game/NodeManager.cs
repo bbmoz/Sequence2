@@ -51,8 +51,10 @@ public class NodeManager : MonoBehaviour {
 		}
 
 		// add score
-		GameManager.Get().score += GameManager.Get().nodesDragged.Count;
+//		GameManager.Get().score += GameManager.Get().nodesDragged.Count;
+		GameManager.Get ().AddScore (Fibbo (GameManager.Get ().nodesDragged.Count));
 		GameManager.Get().nodesDragged.Clear();
+
 
 		// remove all instances of line renderer
 		foreach(Object clone in GameObject.FindGameObjectsWithTag("linerenderer")) {
@@ -62,14 +64,26 @@ public class NodeManager : MonoBehaviour {
 
 	// drag onto another node
 	void OnMouseEnter() {
+		print (GameManager.Get ().nodesDragged.Count);
+		bool nodeTest = true;
 		if (!nodeEntered && GameManager.Get().nodesDragged.Count > 0) {
 			ArrayList nodesDragged = GameManager.Get().nodesDragged;
 			NodeManager nm = ((GameObject)nodesDragged.ToArray()[nodesDragged.Count - 1]).GetComponent<NodeManager>();
+
+			// Check if node was already included in the sequence
+			if (GameManager.Get().nodesDragged.Count > 1) {
+				NodeManager pnm = ((GameObject)nodesDragged.ToArray()[nodesDragged.Count - 2]).GetComponent<NodeManager>();
+				if ((posX == pnm.posX) && (posY == pnm.posY)) {
+					nodeTest = false;
+				}
+			}
 			// limit to immediate adjacent node
-			if ((posX == nm.posX || posX == nm.posX - 1.0f || posX == nm.posX + 1.0f) && (posY == nm.posY || posY == nm.posY - 1.0f || posY == nm.posY + 1.0f)) {
-				// limit to number in next sequence
-				if (number == nm.number - 1 || number == nm.number + 1) {
-					addNodeToNodesDragged();
+			if (nodeTest == true) {
+				if ((posX == nm.posX || posX == nm.posX - 1.0f || posX == nm.posX + 1.0f) && (posY == nm.posY || posY == nm.posY - 1.0f || posY == nm.posY + 1.0f)) {
+					// limit to number in next sequence
+					if (number == nm.number - 1 || number == nm.number + 1) {
+						addNodeToNodesDragged();
+					}
 				}
 			}
 		}
@@ -94,4 +108,15 @@ public class NodeManager : MonoBehaviour {
 			Instantiate(GameManager.Get().lineRenderer);
 		}
 	}
+	private int Fibbo( int a) {
+		if (a==1) { return -50; }
+		int x = 0;
+		int y = 100;
+		for ( int i = 1 ; i < a; i++) {
+			x += y;
+			y += 100;
+		}
+		return x;
+	}
+
 }

@@ -9,6 +9,10 @@ public class GameManager : MonoBehaviour {
 	public int nodeGridSizeY;
 	public GameObject nodeObj;
 
+	// Score variables
+	public GUIText scoreText;
+	private int score;
+
 	// node min, max range
 	public int nodeMin;
 	public int nodeMax;
@@ -36,8 +40,8 @@ public class GameManager : MonoBehaviour {
 	public float sideX;
 	[HideInInspector]
 	public float sideY;
-	[HideInInspector]
-	public int score;
+	//[HideInInspector]
+	//public int score;
 
 	private Shader zapShader;
 
@@ -50,6 +54,10 @@ public class GameManager : MonoBehaviour {
 		sideY = (float)nodeGridSizeY / 2.0f;
 		score = 0;
 		zapShader = Shader.Find("Reflective/Specular");
+
+		// initialize score
+		score = 0;
+		UpdateScore ();
 
 		// spawn nodes
 		for (int x=0; x<nodeGridSizeX; x++) {
@@ -232,4 +240,20 @@ public class GameManager : MonoBehaviour {
 		nodeObj.GetComponent<Transform>().position = new Vector3(x, y, 0.0f);
 		return Instantiate(nodeObj) as GameObject;
 	}
+
+	// Increases the score value
+	public void AddScore (int newScoreValue)
+	{
+		score += newScoreValue;
+		if (score < 0)
+			score = 0;
+		UpdateScore ();
+	}
+	// Updates the score gui text
+	void UpdateScore ()
+	{
+		scoreText.text = "Score: " + score;
+	}
+
+
 }
