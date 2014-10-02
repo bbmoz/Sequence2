@@ -12,11 +12,15 @@ public class NodeManager : MonoBehaviour {
 	// boolean to make sure OnMouseEnter is run once
 	[HideInInspector]
 	public bool nodeEntered;
+	
+	// checks if same number consecutive
+	private bool sameNum;
 
 	// Use this for initialization
 	void Start () {
 		randomizeNumber();
 		nodeEntered = false;
+		sameNum = false;
 	}
 	
 	// Update is called once per frame
@@ -28,7 +32,7 @@ public class NodeManager : MonoBehaviour {
 	/// Randomizes the number.
 	/// </summary>
 	/// <returns>The number.</returns>
-	public void randomizeNumber() {
+	private void randomizeNumber() {
 		number = Random.Range(GameManager.Get().nodeMin, GameManager.gm_Instance.nodeMax + 1);
 		// set texture to node
 		renderer.material.mainTexture = GameManager.Get().nodeTextures[0].numbers[number - 1];
@@ -44,13 +48,31 @@ public class NodeManager : MonoBehaviour {
 	// unclick node
 	void OnMouseUp() {
 		// clear nodes
-		foreach (GameObject node in GameManager.Get().nodesDragged) {
-			node.SetActive(false);
-			/*
-			node.renderer.material.shader = Shader.Find("Diffuse");
-			node.GetComponent<NodeManager>().nodeEntered = false;
-			node.GetComponent<NodeManager>().randomizeNumber();
-			*/
+		object[] nodesDraggedArray = GameManager.Get().nodesDragged.ToArray();
+		ArrayList nodesToRandomize = new ArrayList();
+		for (int i=0; i<nodesDraggedArray.Length; i++) {
+			if (((GameObject)nodesDraggedArray[i]).GetComponent<NodeManager>().sameNum) {
+				// if neighbor node is not the same number, then just deactivate the current node
+				if (i > 0 && i < nodesDraggedArray.Length-1) {
+					int curNum = ((GameObject)nodesDraggedArray[i]).GetComponent<NodeManager>().number;
+					int prevNum = ((GameObject)nodesDraggedArray[i-1]).GetComponent<NodeManager>().number;
+					int postNum = ((GameObject)nodesDraggedArray[i+1]).GetComponent<NodeManager>().number;
+					if (prevNum == curNum + 1 || prevNum == curNum - 1 || postNum == curNum + 1 || postNum == curNum - 1) {
+						((GameObject)nodesDraggedArray[i]).SetActive(false);
+						continue;
+					}
+				}
+				// if same number with no different neighbors
+				nodesToRandomize.Add(nodesDraggedArray[i]);
+			} else {
+				((GameObject)nodesDraggedArray[i]).SetActive(false);
+			}
+		}
+		foreach (GameObject nodeToRandomize in nodesToRandomize) {
+			nodeToRandomize.renderer.material.shader = Shader.Find("Diffuse");
+			nodeToRandomize.GetComponent<NodeManager>().nodeEntered = false;
+			nodeToRandomize.GetComponent<NodeManager>().randomizeNumber();
+			nodeToRandomize.GetComponent<NodeManager>().sameNum = false;
 		}
 
 		// add score
@@ -77,11 +99,16 @@ public class NodeManager : MonoBehaviour {
 			if (nodeTest) {
 				//if ((posX == nm.posX || posX == nm.posX - 1.0f || posX == nm.posX + 1.0f) && (posY == nm.posY || posY == nm.posY - 1.0f || posY == nm.posY + 1.0f)) {
 					// limit to number in next sequence and check if node was already included in the sequence
-					if ((number == nm.number - 1 || number == nm.number + 1) && renderer.material.shader.name != "Mobile/Bumped Specular") {
-						if (nodesDragged.Count > 1) {
-							var i = renderer.material.shader;
+					if ((number == nm.number - 1 || number == nm.number + 1 || number == nm.number) && renderer.material.shader.name != "Mobile/Bumped Specular") {
+						if (number == nm.number) {
+							sameNum = true;
+							if (!nm.sameNum) {
+								nm.sameNum = true;
+							}
 						}
-						addNodeToNodesDragged();
+						if (checkLineCollision()) {
+							addNodeToNodesDragged();
+						}
 					}
 				//}
 			}
@@ -93,17 +120,37 @@ public class NodeManager : MonoBehaviour {
 		nodeEntered = false;
 	}
 
+	// checks if colliding TODO SEE CAPSULE COLLIDER
+	private bool checkLineCollision() {
+		/*
+		RaycastHit[] hits;
+		var nodesDragged = GameManager.Get().nodesDragged.ToArray();
+		Vector3 start = (nodesDragged[nodesDragged.Length-1] as GameObject).transform.position;
+		Vector3 end = transform.position;
+		hits = Physics.RaycastAll(start, (end-start).normalized);
+		if (hits.Length > 1) {
+			return false;
+		}
+		*/
+		return true;
+	}
+
 	// add node to nodes dragged array
 	private void addNodeToNodesDragged() {
 		nodeEntered = true;
-		GameManager.Get().nodesDragged.Add(gameObject);
 		renderer.material.shader = Shader.Find("Mobile/Bumped Specular");
+		GameManager.Get().nodesDragged.Add(gameObject);
 
 		// add line renderer
 		if (GameManager.Get().nodesDragged.Count > 1) {
 			var nodesDragged = GameManager.Get().nodesDragged.ToArray();
-			GameManager.Get().lineRenderer.SetPosition(0, (nodesDragged[nodesDragged.Length-2] as GameObject).transform.position);
-			GameManager.Get().lineRenderer.SetPosition(1, (nodesDragged[nodesDragged.Length-1] as GameObject).transform.position);
+			Vector3 startPos = (nodesDragged[nodesDragged.Length-2] as GameObject).transform.position;
+			Vector3 endPos = (nodesDragged[nodesDragged.Length-1] as GameObject).transform.position;
+			GameManager.Get().lineRenderer.SetPosition(0, startPos);
+			GameManager.Get().lineRenderer.SetPosition(1, endPos);
+			GameManager.Get().lineRendererCollider.transform.position = startPos+(endPos-startPos)/2.0f;
+			GameManager.Get().lineRendererCollider.transform.LookAt(startPos);
+			GameManager.Get().lineRendererCollider.height = (endPos-startPos).magnitude;
 			Instantiate(GameManager.Get().lineRenderer);
 		}
 	}
@@ -119,5 +166,4 @@ public class NodeManager : MonoBehaviour {
 		}
 		return x;
 	}
-
 }

@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour {
 
 	// line renderer
 	public LineRenderer lineRenderer;
+	public CapsuleCollider lineRendererCollider;
 
 	// singleton
 	public static GameManager gm_Instance = null;
@@ -66,7 +67,11 @@ public class GameManager : MonoBehaviour {
 		}
 
 		// set line renderer width
-		lineRenderer.SetWidth(0.3f,0.3f);
+		lineRenderer.SetWidth(0.2f,0.2f);
+		lineRendererCollider = lineRenderer.gameObject.AddComponent("CapsuleCollider") as CapsuleCollider;
+		lineRendererCollider.radius = 0.2f/2.0f;
+		lineRendererCollider.center = Vector3.zero;
+		lineRendererCollider.direction = 2; // z-axis for easier lookat orientation
 	}
 	
 	// Update is called once per frame
