@@ -8,6 +8,8 @@ public class NodeManager : MonoBehaviour {
 
 	// number of node
 	public int number;
+	public int nodesRemaining;
+	static public int[] remainArray = new int[3];
 
 	// boolean to make sure OnMouseEnter is run once
 	[HideInInspector]
@@ -86,6 +88,29 @@ public class NodeManager : MonoBehaviour {
 		foreach(Object clone in GameObject.FindGameObjectsWithTag("linerenderer")) {
 			Destroy(clone);
 		}
+		nodesRemaining = 0;
+		remainArray [0] = 0;
+		remainArray [1] = 0;
+		remainArray [2] = 0;
+		foreach(Object nodeClone in GameObject.FindGameObjectsWithTag("node")) {
+			print(((GameObject)nodeClone).GetComponent<NodeManager>().number + "num");
+				if( ((GameObject)nodeClone).activeSelf == true) {
+					if(nodesRemaining < 3) {
+						print ("hery" + nodesRemaining);
+						remainArray[nodesRemaining] = ((GameObject)nodeClone).GetComponent<NodeManager>().number;
+					}
+				}
+				nodesRemaining += 1;
+
+		}
+		if (nodesRemaining < 3) {
+
+		}
+
+		print(nodesRemaining);
+		print("arr:"+remainArray[0]);
+		print("arr:"+remainArray[1]);
+		print("arr:"+remainArray[2]);
 	}
 
 	// drag onto another node
