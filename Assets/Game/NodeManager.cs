@@ -64,12 +64,14 @@ public class NodeManager : MonoBehaviour {
 						continue;
 					}
 				}
-				// if same number with no different neighbors
+				// if same number with no different neighbors, add to nodesToRandomize array
 				nodesToRandomize.Add(nodesDraggedArray[i]);
 			} else {
-				((GameObject)nodesDraggedArray[i]).SetActive(false);
+				Destroy(((GameObject)nodesDraggedArray[i]));
+				//((GameObject)nodesDraggedArray[i]).SetActive(false);
 			}
 		}
+		// randomzize all the nodes that were found that had a neighbor with a different number
 		foreach (GameObject nodeToRandomize in nodesToRandomize) {
 			nodeToRandomize.renderer.material.shader = Shader.Find("Diffuse");
 			nodeToRandomize.GetComponent<NodeManager>().nodeEntered = false;
@@ -83,6 +85,8 @@ public class NodeManager : MonoBehaviour {
 		// clear nodes dragged array
 		GameManager.Get().nodesDragged.Clear();
 
+		// clear nodes dragged lines array
+		GameManager.Get().nodesDraggedLines.Clear();
 
 		// remove all instances of line renderer
 		foreach(Object clone in GameObject.FindGameObjectsWithTag("linerenderer")) {
@@ -131,9 +135,7 @@ public class NodeManager : MonoBehaviour {
 								nm.sameNum = true;
 							}
 						}
-						if (checkLineCollision()) {
-							addNodeToNodesDragged();
-						}
+						addNodeToNodesDragged();
 					}
 				//}
 			}
@@ -143,21 +145,6 @@ public class NodeManager : MonoBehaviour {
 	// exit hover over node
 	void OnMouseExit() {
 		nodeEntered = false;
-	}
-
-	// checks if colliding TODO SEE CAPSULE COLLIDER
-	private bool checkLineCollision() {
-		/*
-		RaycastHit[] hits;
-		var nodesDragged = GameManager.Get().nodesDragged.ToArray();
-		Vector3 start = (nodesDragged[nodesDragged.Length-1] as GameObject).transform.position;
-		Vector3 end = transform.position;
-		hits = Physics.RaycastAll(start, (end-start).normalized);
-		if (hits.Length > 1) {
-			return false;
-		}
-		*/
-		return true;
 	}
 
 	// add node to nodes dragged array
@@ -173,10 +160,26 @@ public class NodeManager : MonoBehaviour {
 			Vector3 endPos = (nodesDragged[nodesDragged.Length-1] as GameObject).transform.position;
 			GameManager.Get().lineRenderer.SetPosition(0, startPos);
 			GameManager.Get().lineRenderer.SetPosition(1, endPos);
+			GameManager.Get().nodesDraggedLines.Add(Instantiate(GameManager.Get().lineRenderer));
 			GameManager.Get().lineRendererCollider.transform.position = startPos+(endPos-startPos)/2.0f;
 			GameManager.Get().lineRendererCollider.transform.LookAt(startPos);
 			GameManager.Get().lineRendererCollider.height = (endPos-startPos).magnitude;
-			Instantiate(GameManager.Get().lineRenderer);
+
+			// check if linerender intersects with any gameobjects
+			Bounds lineBounds = GameManager.Get().lineRendererCollider.bounds;
+			Bounds nodeBounds;
+			int count = 0;
+			foreach(Object clone in GameObject.FindGameObjectsWithTag("node")) {
+				nodeBounds = (((GameObject)clone).GetComponent("CapsuleCollider") as CapsuleCollider).bounds;
+				if (nodeBounds.Intersects(lineBounds)) { // WHY ISN'T THIS WORKING?!@?!? TODO
+					count++;
+				}
+			}
+
+			// 1
+
+
+			print(count);
 		}
 	}
 
