@@ -23,9 +23,13 @@ public class GameManager : MonoBehaviour {
 	// store dragging nodes
 	public ArrayList nodesDragged;
 
+	// store line renderers
+	public ArrayList nodesDraggedLines;
+
 	// line renderer
 	public LineRenderer lineRenderer;
 	public CapsuleCollider lineRendererCollider;
+	public float lineWidth;
 
 	// singleton
 	public static GameManager gm_Instance = null;
@@ -51,6 +55,7 @@ public class GameManager : MonoBehaviour {
 		// grid should be generated at origin
 		nodeGrid = new GameObject[nodeGridSizeX, nodeGridSizeY];
 		nodesDragged = new ArrayList();
+		nodesDraggedLines = new ArrayList();
 		sideX = (float)nodeGridSizeX / 2.0f;
 		sideY = (float)nodeGridSizeY / 2.0f;
 		zapShader = Shader.Find("Reflective/Specular");
@@ -67,11 +72,11 @@ public class GameManager : MonoBehaviour {
 		}
 
 		// set line renderer width
-		lineRenderer.SetWidth(0.2f,0.2f);
-		lineRendererCollider = lineRenderer.gameObject.AddComponent("CapsuleCollider") as CapsuleCollider;
-		lineRendererCollider.radius = 0.2f/2.0f;
+		lineRenderer.SetWidth(lineWidth,lineWidth);
+		lineRendererCollider = lineRenderer.gameObject.GetComponent("CapsuleCollider") as CapsuleCollider;
+		lineRendererCollider.radius = lineWidth/2.0f;
 		lineRendererCollider.center = Vector3.zero;
-		lineRendererCollider.direction = 2; // z-axis for easier lookat orientation
+		//lineRendererCollider.direction = 2; // z-axis for easier lookat orientation
 	}
 	
 	// Update is called once per frame
