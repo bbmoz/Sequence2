@@ -62,7 +62,7 @@ public class GameManager : MonoBehaviour {
 		// spawn nodes
 		for (int x=0; x<nodeGridSizeX; x++) {
 			for (int y=0; y<nodeGridSizeY; y++) {
-				nodeGrid[x,y] = spawnNode(x-sideX, y-sideY);
+				nodeGrid[x,y] = spawnNode(x-sideX, y-sideY, 3f);
 			}
 		}
 
@@ -238,9 +238,10 @@ public class GameManager : MonoBehaviour {
 	/// <summary>
 	/// Spawns the node.
 	/// </summary>
-	private GameObject spawnNode(float x, float y) {
+	private GameObject spawnNode(float x, float y, float health) {
 		nodeObj.GetComponent<NodeManager>().posX = x;
 		nodeObj.GetComponent<NodeManager>().posY = y;
+		nodeObj.GetComponent<NodeManager>().nodeHealth = health;
 		nodeObj.GetComponent<Transform>().position = new Vector3(x, y, 0.0f);
 		return Instantiate(nodeObj) as GameObject;
 	}

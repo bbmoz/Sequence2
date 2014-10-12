@@ -5,6 +5,7 @@ public class NodeManager : MonoBehaviour {
 	// position of node
 	public float posX;
 	public float posY;
+	public float nodeHealth;
 
 	// number of node
 	public int number;
@@ -60,14 +61,28 @@ public class NodeManager : MonoBehaviour {
 					int prevNum = ((GameObject)nodesDraggedArray[i-1]).GetComponent<NodeManager>().number;
 					int postNum = ((GameObject)nodesDraggedArray[i+1]).GetComponent<NodeManager>().number;
 					if (prevNum == curNum + 1 || prevNum == curNum - 1 || postNum == curNum + 1 || postNum == curNum - 1) {
-						((GameObject)nodesDraggedArray[i]).SetActive(false);
+						print (((GameObject)nodesDraggedArray[i]).GetComponent<NodeManager>().nodeHealth);
+						((GameObject)nodesDraggedArray[i]).GetComponent<NodeManager>().nodeHealth -= 1;
+						renderer.material.shader = Shader.Find("Diffuse");
+						print (((GameObject)nodesDraggedArray[i]).GetComponent<NodeManager>().nodeHealth);
+						if (((GameObject)nodesDraggedArray[i]).GetComponent<NodeManager>().nodeHealth <= 0){
+							((GameObject)nodesDraggedArray[i]).SetActive(false);
+						}
+						((GameObject)nodesDraggedArray[i]).renderer.material.shader = Shader.Find("Diffuse");
 						continue;
 					}
 				}
 				// if same number with no different neighbors
 				nodesToRandomize.Add(nodesDraggedArray[i]);
 			} else {
-				((GameObject)nodesDraggedArray[i]).SetActive(false);
+				print (((GameObject)nodesDraggedArray[i]).GetComponent<NodeManager>().nodeHealth);
+				((GameObject)nodesDraggedArray[i]).GetComponent<NodeManager>().nodeHealth -= 1;
+				renderer.material.shader = Shader.Find("Diffuse");
+				print (((GameObject)nodesDraggedArray[i]).GetComponent<NodeManager>().nodeHealth);
+				if (((GameObject)nodesDraggedArray[i]).GetComponent<NodeManager>().nodeHealth <= 0){
+					((GameObject)nodesDraggedArray[i]).SetActive(false);
+				}
+				((GameObject)nodesDraggedArray[i]).renderer.material.shader = Shader.Find("Diffuse");
 			}
 		}
 		foreach (GameObject nodeToRandomize in nodesToRandomize) {
@@ -93,10 +108,10 @@ public class NodeManager : MonoBehaviour {
 		remainArray [1] = 0;
 		remainArray [2] = 0;
 		foreach(Object nodeClone in GameObject.FindGameObjectsWithTag("node")) {
-			print(((GameObject)nodeClone).GetComponent<NodeManager>().number + "num");
+//			print(((GameObject)nodeClone).GetComponent<NodeManager>().number + "num");
 				if( ((GameObject)nodeClone).activeSelf == true) {
 					if(nodesRemaining < 3) {
-						print ("hery" + nodesRemaining);
+//						print ("hery" + nodesRemaining);
 						remainArray[nodesRemaining] = ((GameObject)nodeClone).GetComponent<NodeManager>().number;
 					}
 				}
@@ -107,15 +122,16 @@ public class NodeManager : MonoBehaviour {
 
 		}
 
-		print(nodesRemaining);
-		print("arr:"+remainArray[0]);
-		print("arr:"+remainArray[1]);
-		print("arr:"+remainArray[2]);
+//		print(nodesRemaining);
+//		print("arr:"+remainArray[0]);
+//		print("arr:"+remainArray[1]);
+//		print("arr:"+remainArray[2]);
 	}
 
 	// drag onto another node
 	void OnMouseEnter() {
 		if (!nodeEntered && GameManager.Get().nodesDragged.Count > 0) {
+			print ("hehe");
 			bool nodeTest = true;
 			ArrayList nodesDragged = GameManager.Get().nodesDragged;
 			NodeManager nm = ((GameObject)nodesDragged.ToArray()[nodesDragged.Count - 1]).GetComponent<NodeManager>();
